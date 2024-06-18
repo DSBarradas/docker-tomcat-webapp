@@ -5,3 +5,5 @@
 # ignore server key and certifacte files
 ssl/certs/server-cert.pem
 ssl/private/server-key.pem
+
+ssl/certs/ca-cert.srl
