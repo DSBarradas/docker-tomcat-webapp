@@ -18,7 +18,6 @@ Deploy a [sample web app](https://tomcat.apache.org/tomcat-8.5-doc/appdev/sample
 |--- scripts
      |--- tomcat.sh
      |--- server-key.sh
-     |--- client-key.sh
 |--- tomcat-config
      |--- server.xml
      |--- sample.war
@@ -36,7 +35,6 @@ Deploy a [sample web app](https://tomcat.apache.org/tomcat-8.5-doc/appdev/sample
 * `scripts`
   * `tomcat.sh`  ---> prepare Tomcat image during build.
   * `server-key.sh` ---> generate server key and certificate.
-  * `client-key.sh` ---> generate client key and certificate.
 * `tomcat-config`
   * `server.xml` ---> Tomcat server configuration.
   * `sample.war` ---> Webapp file.
