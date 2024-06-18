@@ -1,4 +1,3 @@
-# docker-tomcat-webapp
 
 ### Description
 Deploy a sample web app in a tomcat on a docker. 
@@ -99,7 +98,6 @@ Clean test environment.
 vagrant destroy         # specify -f to ot ask for confirmation before destroying
 ```
 
-
 ##  Generating CA public certificate & CA private key
 
 ```bash
@@ -108,7 +106,7 @@ vagrant destroy         # specify -f to ot ask for confirmation before destroyin
 # [-out filename]     (output the key to the specified file)
 # [numbits]           (size of the private key)
 
-openssl genrsa -aes256 -out ca-key.pem 4096  
+openssl genrsa -aes256 -passout pass:challenge -out ca-key.pem 4096  
 ```
 
 ##### Note: When this command is executed, an input pass phrase for ca-key is required. 
@@ -122,7 +120,7 @@ openssl genrsa -aes256 -out ca-key.pem 4096
 # [-digest]         (specifies the message digest to sign the request)
 # [-out filename]   (specifies the output filename)
 
-openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -out ca-cert.pem
+openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -passin pass:challenge -out ca-cert.pem
 ```
 ##### Note: To generate the CA certicate, the input pass phrase for ca-key is required.
 
@@ -184,6 +182,83 @@ From the references mentioned, we conclude that the following section will have 
 
 To be continued...
 
+## Client Key
+
+```bash
+
+sudo -i
+
+mkdir -p /etc/ssl/private
+mkdir -p /etc/ssl/certs
+
+cp /vagrant_data/ca-key.pem /etc/ssl/private/ca-key.pem
+cp /vagrant_data/ca-cert.pem /etc/ssl/certs/ca-cert.pem
+
+# create a client key
+openssl genrsa -out /etc/ssl/private/client-key.pem 4096
+
+# certificate signing request
+openssl req -subj '/CN=client' -new -key /etc/ssl/private/client-key.pem -out /etc/ssl/certs/client.csr
+
+# make the key suitable for client authentication
+echo extendedKeyUsage = clientAuth > /etc/ssl/certs/extfile-client.cnf
+
+# generate the signed certificate
+openssl x509 -req -days 365 -sha256 -in /etc/ssl/certs/client.csr -CA /etc/ssl/certs/ca-cert.pem -CAkey /etc/ssl/private/ca-key.pem \
+  -CAcreateserial -passin pass:challenge -out /etc/ssl/certs/client-cert.pem -extfile /etc/ssl/certs/extfile-client.cnf
+
+exit # quit sudo mode
+
+#--------------------------------------------------------------------------------------
+
+# remove the two certificate signing requests and extensions config files
+sudo rm -v /etc/ssl/certs/client.csr /etc/ssl/certs/extfile-client.cnf
+
+# remove keys write permissions (prevent accidental damage)
+sudo chmod -v 0400 /etc/ssl/private/ca-key.pem  /etc/ssl/private/client-key.pem
+
+# remove certificates write access (prevent accidental damage)
+sudo chmod -v 0444 etc/ssl/certs/ca-cert.pem etc/ssl/certs/client-cert.pem
+```
+
+
+
+## Vagrantfile 
+
+```bash
+vagrant@ubuntu:/vagrant_data$ whoami
+vagrant
+```
+
+```bash
+# Create the docker group
+sudo groupadd docker
+
+# Add vagrant user to the docker group
+# [-a] (Add the user to the supplementary group. Use only with the -G option)
+# [-G] (A list of supplementary groups which the user is also a member of)
+sudo usermod -aG docker vagrant
+```
+
+## File Structure
+
+```
+|--- Vagrantfile
+|--- Dockerfile
+|--- tomcat.sh
+|--- server-key.sh
+|--- client-key.sh
+|--- server.xml
+|--- sample.war
+|--- ssl
+|    |--- certs
+|         |--- ca-cert.pem
+|    |--- private
+|         |--- ca-key.pem
+|
+```
+
+
 ## References
 
 [Install Docker Engine on Ubuntu (test environment VM)]( https://docs.docker.com/engine/install/ubuntu/ )
@@ -195,3 +270,4 @@ To be continued...
 [Openssl Documentation](https://www.openssl.org/docs/man3.3/man1/openssl.html)
 
 [SSL/TLS on Tomcat](https://tomcat.apache.org/tomcat-8.5-doc/ssl-howto.html)
+

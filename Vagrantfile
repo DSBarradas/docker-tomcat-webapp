@@ -31,7 +31,8 @@ Vagrant.configure("2") do |config|
     # 1 - Set up Docker's apt repository --------------------------------------------------------
 
     # i) Add Docker's official GPG key:
-    sudo apt-get -y update
+    sudo apt-get update -y
+    sudo apt-get upgrade -y
     sudo apt-get install -y ca-certificates curl
     sudo install -m 0755 -d /etc/apt/keyrings
     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
@@ -46,9 +47,25 @@ Vagrant.configure("2") do |config|
 
     # 2 - Install the Docker packages -----------------------------------------------------------
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-    
+
+    # Add vagrant user to the docker group
+    # [-a] (Add the user to the supplementary group. Use only with the -G option)
+    # [-G] (A list of supplementary groups which the user is also a member of)
+    sudo usermod -aG docker vagrant
+
     # start the docker service
-    sudo systemctl start docker
+    systemctl start docker
+
+    # certicates
+
+    sudo mkdir -p /etc/ssl/private
+    sudo mkdir -p /etc/ssl/certs
+
+    sudo cp /vagrant_data/ssl/private/ca-key.pem /etc/ssl/private/ca-key.pem
+    sudo cp /vagrant_data/ssl/certs/ca-cert.pem /etc/ssl/certs/ca-cert.pem
+
+    sudo sh /vagrant_data/scripts/server-key.sh
+    sudo sh /vagrant_data/scripts/client-key.sh
 
     SHELL
 end
