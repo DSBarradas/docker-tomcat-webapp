@@ -47,7 +47,7 @@ Vagrant.configure("2") do |config|
 
     # 2 - Install the Docker packages -----------------------------------------------------------
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
+    
     # Add vagrant user to the docker group
     # [-a] (Add the user to the supplementary group. Use only with the -G option)
     # [-G] (A list of supplementary groups which the user is also a member of)
