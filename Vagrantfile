@@ -23,17 +23,20 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "shell", inline: <<-SHELL
 
+    # update the VM
+    sudo apt-get update -y
+    sudo apt-get upgrade -y
+
+    # intall CA certificates and cURL
+    sudo apt-get install -y ca-certificates curl
+
     # uninstall old versions of docker
     for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; \
     do sudo apt-get remove $pkg; \
     done
 
-    # 1 - Set up Docker's apt repository --------------------------------------------------------
-
+    # Set up Docker's apt repository 
     # i) Add Docker's official GPG key:
-    sudo apt-get update -y
-    sudo apt-get upgrade -y
-    sudo apt-get install -y ca-certificates curl
     sudo install -m 0755 -d /etc/apt/keyrings
     sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
     sudo chmod a+r /etc/apt/keyrings/docker.asc
@@ -45,7 +48,7 @@ Vagrant.configure("2") do |config|
       sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update
 
-    # 2 - Install the Docker packages -----------------------------------------------------------
+    # Install the Docker packages 
     sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     
     # Add vagrant user to the docker group
@@ -56,16 +59,14 @@ Vagrant.configure("2") do |config|
     # start the docker service
     systemctl start docker
 
-    # certicates
+    # Install CA on the VM
+    sudo mkdir -p /usr/local/share/ca-certificates/
+    sudo cp /vagrant_data/ssl/certs/ca-cert.pem /usr/local/share/ca-certificates
+    sudo openssl x509 -in /usr/local/share/ca-certificates/ca-cert.pem -inform PEM -out /usr/local/share/ca-certificates/ca-cert.crt
+    sudo update-ca-certificates
 
-    sudo mkdir -p /etc/ssl/private
-    sudo mkdir -p /etc/ssl/certs
-
-    sudo cp /vagrant_data/ssl/private/ca-key.pem /etc/ssl/private/ca-key.pem
-    sudo cp /vagrant_data/ssl/certs/ca-cert.pem /etc/ssl/certs/ca-cert.pem
-
+    # Generate Server Certicates
     sudo sh /vagrant_data/scripts/server-key.sh
-    sudo sh /vagrant_data/scripts/client-key.sh
 
     SHELL
 end

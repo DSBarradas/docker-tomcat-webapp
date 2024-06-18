@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo mkdir -p /etc/ssl/private
+sudo mkdir -p /etc/ssl/certs
+
 # create a server private key 
 sudo openssl genrsa -passout pass:challenge -out /etc/ssl/private/server-key.pem 4096 
 
@@ -24,19 +27,12 @@ sudo /bin/bash -c 'echo extendedKeyUsage = serverAuth >> /etc/ssl/certs/extfile.
 # [-out filename]       (specifies the output filename to write)
 # [-extfile filename]   (Configuration file containing certificate and request X.509 extensions to add)
 
-sudo openssl x509 -req -days 365 -sha256 -in /etc/ssl/certs/server.csr -CA /etc/ssl/certs/ca-cert.pem -CAkey /etc/ssl/private/ca-key.pem \
+sudo openssl x509 -req -days 365 -sha256 -in /etc/ssl/certs/server.csr -CA /vagrant_data/ssl/certs/ca-cert.pem -CAkey /vagrant_data/ssl/private/ca-key.pem \
   -CAcreateserial -passin pass:challenge -out /etc/ssl/certs/server-cert.pem -extfile /etc/ssl/certs/extfile.cnf
-
-#------------------------------------------------------------------------------------------------
 
 # remove the two certificate signing requests and extensions config files
 sudo rm -v /etc/ssl/certs/server.csr /etc/ssl/certs/extfile.cnf
 
+# move the file to the tomcat docker context directory
 sudo mv /etc/ssl/private/server-key.pem /vagrant_data/ssl/private
 sudo mv /etc/ssl/certs/server-cert.pem /vagrant_data/ssl/certs
-
-# remove keys write permissions (prevent accidental damage)
-# chmod -v 0400 /etc/ssl/private/ca-key.pem /etc/ssl/private/server-key.pem
-
-# remove certificates write access (prevent accidental damage)
-# chmod -v 0444 /etc/ssl/certs/ca-cert.pem /etc/ssl/certs/server-cert.pem

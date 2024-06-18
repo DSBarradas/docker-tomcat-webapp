@@ -146,7 +146,7 @@ vagrant destroy         # specify -f to destroy without asking for confirmation
 # [-out filename]     (output the key to the specified file)
 # [numbits]           (size of the private key)
 
-openssl genrsa -aes256 -passout pass:challenge -out ca-key.pem 4096  
+openssl genrsa -aes256 -passout pass:challenge -out /vagrant_data/ssl/private/ca-key.pem 4096  
 ```
 
 ##### Note: When this command is executed, an input pass phrase for ca-key is required. 
@@ -160,7 +160,7 @@ openssl genrsa -aes256 -passout pass:challenge -out ca-key.pem 4096
 # [-digest]         (specifies the message digest to sign the request)
 # [-out filename]   (specifies the output filename)
 
-openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -passin pass:challenge -out ca-cert.pem
+openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -passin pass:challenge -out /vagrant_data/ssl/certs/ca-cert.pem
 ```
 ##### Note: To generate the CA certicate, the input pass phrase for ca-key is required.
 

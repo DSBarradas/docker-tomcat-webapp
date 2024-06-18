@@ -17,4 +17,3 @@ EXPOSE 8080 4041
 
 # run the webapp in the tomcat server
 CMD ["/opt/tomcat/apache-tomcat-8.5.100/bin/catalina.sh", "run"]
-
