@@ -60,9 +60,9 @@ Vagrant.configure("2") do |config|
     systemctl start docker
 
     # Install CA on the VM
+    sudo openssl x509 -in /vagrant_data/ssl/certs/ca-cert.pem -inform PEM -out /vagrant_data/ssl/certs/ca-cert.crt
     sudo mkdir -p /usr/local/share/ca-certificates/
-    sudo cp /vagrant_data/ssl/certs/ca-cert.pem /usr/local/share/ca-certificates
-    sudo openssl x509 -in /usr/local/share/ca-certificates/ca-cert.pem -inform PEM -out /usr/local/share/ca-certificates/ca-cert.crt
+    sudo cp /vagrant_data/ssl/certs/ca-cert.crt /usr/local/share/ca-certificates
     sudo update-ca-certificates
 
     # Generate Server Certicates

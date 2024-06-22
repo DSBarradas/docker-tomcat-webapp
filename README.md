@@ -162,6 +162,35 @@ openssl req -new -x509 -days 365 -key ca-key.pem -sha256 -passin pass:challenge 
 ```
 ##### Note: To generate the CA certicate, the input pass phrase for ca-key is required.
 
+## Installing CA on Windows
+
+- Click the Windows Start button;
+- Type `mmc.exe`, right-click the `mmc.exe` entry in the search results and select Run as Administrator;
+- Select File > Add/Remove Snap-in;
+- Select Certificates and click Add;
+- In the Certificates snap-in dialog, select Computer account and complete the wizard.
+- Click OK.
+- In the MMC console, expand Certificates.
+- Right-click Trusted Root Certificates and select All Tasks > Import.
+- Browse your project folder and you'll find the CA certificate under `ssl/certs/ca-cert.crt`
+
+## Results
+
+- On the VM
+  - HTTP 
+  <br> (to be added)
+  - HTTPS
+  <br> (to be added)
+
+- On Windows
+  - Without the CA installed
+  <br> (to be added)
+  - With the CA installed
+  <br> (to be added)
+
+##### Note: In order to test on a browser on Windows you have to enable port forwarding from port 443 on your Windows Host to the port 4041 on your VM.
+
+
 ## References
 
 [Install Docker Engine on Ubuntu (test environment VM)]( https://docs.docker.com/engine/install/ubuntu/ )
